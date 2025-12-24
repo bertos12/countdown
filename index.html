@@ -6,90 +6,91 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+* { margin:0; padding:0; box-sizing:border-box; }
 
 html, body {
-  width: 100%;
-  height: 100%;
+  width:100%;
+  height:100%;
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* BACKGROUND */
 body {
-  min-height: 100vh;
-  background-image: url("schimmelreiter_desktop.jpg");
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  overflow: hidden;
+  min-height:100vh;
+  background-image:url("schimmelreiter_desktop.jpg");
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+  overflow:hidden;
 }
 
-@media (max-width: 768px) {
+@media (max-width:768px) {
   body {
-    background-image: url("schimmelreiter_mobil.jpg");
-    background-position: top center;
+    background-image:url("schimmelreiter_mobil.jpg");
+    background-position:top center;
   }
 }
 
+/* RAIN */
 #rain {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
 }
 
+/* WRAPPER */
 .countdown-wrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding-bottom: 12vh;
-  z-index: 10;
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  padding-bottom:12vh;
+  z-index:10;
 }
 
+/* GLASS BOX */
 .glass-box {
-  padding: 16px 18px;
-  background: rgba(20,20,30,0.55);
-  backdrop-filter: blur(10px);
-  border-radius: 16px;
-  color: #fff;
-  text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  padding:16px 18px;
+  background:rgba(20,20,30,0.55);
+  backdrop-filter:blur(10px);
+  border-radius:16px;
+  color:#fff;
+  text-align:center;
+  box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
+/* COUNTDOWN */
 .countdown {
-  display: flex;
-  gap: 14px;
+  display:flex;
+  gap:14px;
 }
 
 .time {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 60px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  min-width:60px;
 }
 
 .time span {
-  font-size: 1.6rem;
-  font-weight: bold;
+  font-size:1.6rem;
+  font-weight:bold;
 }
 
 .time label {
-  font-size: 0.7rem;
-  opacity: 0.8;
+  font-size:0.7rem;
+  opacity:0.8;
 }
 
 /* CHRISTMAS */
 .christmas-box {
-  font-size: 1.4rem;
-  font-weight: bold;
+  font-size:1.4rem;
+  font-weight:bold;
 }
 
 .christmas-glow {
@@ -119,10 +120,12 @@ body {
 
 <div class="countdown-wrapper">
 
+  <!-- 🎄 WEIHNACHT -->
   <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
     🎄 Frohe Weihnachten 🎄
   </div>
 
+  <!-- ⏳ COUNTDOWN -->
   <div class="glass-box countdown">
     <div class="time"><span id="days">0</span><label>TAGE</label></div>
     <div class="time"><span id="hours">00</span><label>STD</label></div>
@@ -133,16 +136,16 @@ body {
 </div>
 
 <script>
-/* ======================================================
+/* =====================
    HELPERS
-====================================================== */
+===================== */
 function isMobile() {
   return window.innerWidth <= 768;
 }
 
-/* ======================================================
-   RAIN – FINAL (Mobile schneller)
-====================================================== */
+/* =====================
+   RAIN
+===================== */
 const canvas = document.getElementById("rain");
 const ctx = canvas.getContext("2d");
 
@@ -153,20 +156,17 @@ const GRAVITY_Y = 6.5;
 function resize() {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
-
   const density = Math.floor(w / (isMobile() ? 4 : 8));
   drops = Array.from({ length: density }, createDrop);
 }
-
 window.addEventListener("resize", resize);
 resize();
 
 function createDrop() {
   const vx = WIND_X + Math.random() * (isMobile() ? -1.6 : -1.2);
-
-  const vy = (isMobile()
-    ? GRAVITY_Y + 3 + Math.random() * 3.5   // 🔥 MOBILE SCHNELLER
-    : GRAVITY_Y + Math.random() * 2.5);
+  const vy = isMobile()
+    ? GRAVITY_Y + 3 + Math.random() * 3.5
+    : GRAVITY_Y + Math.random() * 2.5;
 
   const len = isMobile()
     ? 20 + Math.random() * 30
@@ -200,7 +200,6 @@ function rain() {
   for (const d of drops) {
     ctx.moveTo(d.x, d.y);
     ctx.lineTo(d.x - d.nx*d.len, d.y - d.ny*d.len);
-
     d.x += d.vx;
     d.y += d.vy;
 
@@ -211,12 +210,11 @@ function rain() {
   ctx.stroke();
   requestAnimationFrame(rain);
 }
-
 rain();
 
-/* ======================================================
+/* =====================
    CHRISTMAS + COUNTDOWN
-====================================================== */
+===================== */
 const targetDate = new Date(2026,6,8,19,30,0);
 
 function isChristmasToday() {
@@ -237,13 +235,18 @@ function updateChristmasBox() {
 
 function updateCountdown() {
   const diff = targetDate - new Date();
-  document.getElementById("days").textContent = Math.max(0, Math.floor(diff/86400000));
+
+  document.getElementById("days").textContent =
+    Math.max(0, Math.floor(diff / 86400000));
+
   document.getElementById("hours").textContent =
-    String(Math.max(0, Math.floor(diff/3600000)%24)).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff / 3600000) % 24)).padStart(2,"0");
+
   document.getElementById("minutes").textContent =
-    String(Math.max(0, Math.floor(diff/60000)%60))).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff / 60000) % 60)).padStart(2,"0");
+
   document.getElementById("seconds").textContent =
-    String(Math.max(0, Math.floor(diff/1000)%60))).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff / 1000) % 60)).padStart(2,"0");
 }
 
 updateChristmasBox();
