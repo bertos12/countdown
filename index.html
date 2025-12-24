@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #111;
+      background: #000;
       color: #fff;
       display: flex;
       justify-content: center;
@@ -15,8 +15,60 @@
       height: 100vh;
       margin: 0;
     }
+
+    /* Hintergrund für Mobilgeräte */
+    @media (max-width: 768px) {
+      body {
+        background: url("03-schimmelreiter-musical-hero-750x750.jpg") no-repeat center center fixed;
+        background-size: cover;
+      }
+    }
+
+    /* Hintergrund für Desktop / PC */
+    @media (min-width: 769px) {
+      body {
+        background: url("schimmelreiter-landscape-1380x575.jpg") no-repeat center center fixed;
+        background-size: cover;
+      }
+    }
     .countdown {
       text-align: center;
+      max-width: 90%;
+      background: rgba(0, 0, 0, 0.45);
+      padding: 20px 30px;
+      border-radius: 14px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      position: absolute;
+      bottom: 10%;
+    }
+
+    /* Desktop: Countdown links platzieren */
+    @media (min-width: 769px) {
+      .countdown {
+        left: 5%;
+        text-align: left;
+      }
+    }
+
+    /* Desktop: Countdown links platzieren */
+    @media (min-width: 769px) {
+      .countdown {
+        position: absolute;
+        left: 5%;
+        text-align: left;
+      }
+    }
+
+    /* Desktop: Countdown links platzieren */
+    @media (min-width: 769px) {
+      .countdown {
+        position: absolute;
+        left: 5%;
+        text-align: left;
+      }
     }
     .time {
       font-size: 2.2rem;
@@ -26,24 +78,43 @@
       font-size: 1rem;
       color: #aaa;
     }
+  
+    /* Realistischer Regen-Effekt (Canvas) */
+    canvas#rain {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .countdown {
+      z-index: 2;
+    }
   </style>
 </head>
 <body>
+  <canvas id="rain"></canvas>
   <div class="countdown">
-    <h1>Countdown bis zum 03.07.2026</h1>
+    
     <div class="time" id="countdown">Lade…</div>
     
   </div>
 
   <script>
-    const targetDate = new Date("2026-07-03T00:00:00");
+    const targetDate = new Date("2026-07-08T19:30:00");
 
     function updateCountdown() {
       const now = new Date();
       const diff = targetDate - now;
 
+      const el = document.getElementById("countdown");
+      if (!el) return;
+
       if (diff <= 0) {
-        document.getElementById("countdown").textContent = "Zeit abgelaufen!";
+        el.textContent = "Zeit abgelaufen!";
         return;
       }
 
@@ -52,16 +123,72 @@
       const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-      const text = days + " Tage "
-        + hours + " Stunden "
-        + minutes + " Minuten "
-        + seconds + " Sekunden";
-
-      document.getElementById("countdown").textContent = text;
+      el.textContent =
+        days + " Tage " +
+        hours + " Stunden " +
+        minutes + " Minuten " +
+        seconds + " Sekunden";
     }
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
+
+    // ===== Regen (Canvas) – stabil & korrekt =====
+    const canvas = document.getElementById("rain");
+    const ctx = canvas.getContext("2d");
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    const wind = -0.55; // minimal stärkerer Wind nach links // sehr leichter Wind nach links
+    const drops = Array.from({ length: 200 }, () => {
+      const vy = 4 + Math.random() * 4;   // Fallgeschwindigkeit
+      const vx = wind * vy;               // exakt gleicher Winkel
+      return {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx,
+        vy,
+        length: 12 + Math.random() * 18
+      };
+    });
+
+    function drawRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "rgba(255,255,255,0.3)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+
+      for (const d of drops) {
+        ctx.moveTo(d.x, d.y);
+        ctx.lineTo(d.x + d.vx * 2, d.y + d.vy * 2);
+
+        d.x += d.vx;
+        d.y += d.vy;
+
+                if (d.y > canvas.height || d.x < -50 || d.x > canvas.width + 50) {
+          // Neu einspawnen: oben ODER rechts, damit unten rechts auch Regen ist
+                    if (Math.random() < 0.7) { // häufiger von oben, weniger von rechts
+            // von oben
+            d.y = -20;
+            d.x = Math.random() * canvas.width;
+          } else {
+                        // von rechts (reduzierte Dichte)
+            d.x = canvas.width + 20;
+            d.y = Math.random() * canvas.height * 0.5;
+          }
+        }
+      }
+
+      ctx.stroke();
+      requestAnimationFrame(drawRain);
+    }
+
+    drawRain();
   </script>
 </body>
 </html>
