@@ -1,56 +1,63 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Countdown bis 03.07.2026</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Countdown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
+    /* ========== Grundlayout ========== */
     body {
       font-family: Arial, Helvetica, sans-serif;
-      background: #000;
+      margin: 0;
+      height: 100vh;
       color: #fff;
+      background: #000;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      overflow: hidden;
     }
 
-    /* Hintergrund für Mobilgeräte */
+    /* ========== Hintergrundbilder ========== */
     @media (max-width: 768px) {
       body {
         background: url("03-schimmelreiter-musical-hero-750x750.jpg") no-repeat center center fixed;
-        background-size: 115%; /* leicht rausgezoomt */
-      }
-
-      .countdown {
-        bottom: 5%; /* weiter nach unten */
+        background-size: cover;
       }
     }
-    }
 
-    /* Hintergrund für Desktop / PC */
     @media (min-width: 769px) {
       body {
         background: url("schimmelreiter-landscape-1380x575.jpg") no-repeat center center fixed;
         background-size: cover;
       }
     }
+
+    /* ========== Countdown-Box (Glass) ========== */
     .countdown {
-      text-align: center;
-      max-width: 90%;
-      background: rgba(0, 0, 0, 0.45);
-      padding: 20px 30px;
-      border-radius: 14px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(10px) saturate(120%);
-      -webkit-backdrop-filter: blur(10px) saturate(120%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
       position: absolute;
       bottom: 10%;
+      max-width: 90%;
+      padding: 20px 30px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(10px) saturate(120%);
+      -webkit-backdrop-filter: blur(10px) saturate(120%);
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
 
-    /* Desktop: Countdown links platzieren */
+    /* Mobil: etwas weiter nach unten */
+    @media (max-width: 768px) {
+      .countdown {
+        bottom: 2%;
+      }
+    }
+
+    /* Desktop: links positionieren */
     @media (min-width: 769px) {
       .countdown {
         left: 5%;
@@ -58,63 +65,34 @@
       }
     }
 
-    /* Desktop: Countdown links platzieren */
-    @media (min-width: 769px) {
-      .countdown {
-        position: absolute;
-        left: 5%;
-        text-align: left;
-      }
-    }
-
-    /* Desktop: Countdown links platzieren */
-    @media (min-width: 769px) {
-      .countdown {
-        position: absolute;
-        left: 5%;
-        text-align: left;
-      }
-    }
     .time {
       font-size: 2.2rem;
       line-height: 1.4;
     }
-    .label {
-      font-size: 1rem;
-      color: #aaa;
-    }
-  
-    /* Realistischer Regen-Effekt (Canvas) */
+
+    /* ========== Regen (Canvas) ========== */
     canvas#rain {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset: 0;
       pointer-events: none;
       z-index: 1;
     }
-
-    .countdown {
-      z-index: 2;
-    }
   </style>
 </head>
+
 <body>
   <canvas id="rain"></canvas>
+
   <div class="countdown">
-    
     <div class="time" id="countdown">Lade…</div>
-    
   </div>
 
   <script>
+    /* ===== Countdown ===== */
     const targetDate = new Date("2026-07-08T19:30:00");
 
     function updateCountdown() {
-      const now = new Date();
-      const diff = targetDate - now;
-
+      const diff = targetDate - new Date();
       const el = document.getElementById("countdown");
       if (!el) return;
 
@@ -123,22 +101,18 @@
         return;
       }
 
-      const seconds = Math.floor(diff / 1000) % 60;
-      const minutes = Math.floor(diff / (1000 * 60)) % 60;
-      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const s = Math.floor(diff / 1000) % 60;
+      const m = Math.floor(diff / 60000) % 60;
+      const h = Math.floor(diff / 3600000) % 24;
+      const d = Math.floor(diff / 86400000);
 
-      el.textContent =
-        days + " Tage " +
-        hours + " Stunden " +
-        minutes + " Minuten " +
-        seconds + " Sekunden";
+      el.textContent = `${d} Tage ${h} Stunden ${m} Minuten ${s} Sekunden`;
     }
 
     updateCountdown();
     setInterval(updateCountdown, 1000);
 
-    // ===== Regen (Canvas) – stabil & korrekt =====
+    /* ===== Regen ===== */
     const canvas = document.getElementById("rain");
     const ctx = canvas.getContext("2d");
 
@@ -146,19 +120,19 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
+
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    const wind = -0.55; // minimal stärkerer Wind nach links // sehr leichter Wind nach links
+    const wind = -0.55; // leichter Wind nach links
     const drops = Array.from({ length: 200 }, () => {
-      const vy = 4 + Math.random() * 4;   // Fallgeschwindigkeit
-      const vx = wind * vy;               // exakt gleicher Winkel
+      const vy = 4 + Math.random() * 4;
+      const vx = wind * vy;
       return {
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
         vx,
-        vy,
-        length: 12 + Math.random() * 18
+        vy
       };
     });
 
@@ -175,14 +149,11 @@
         d.x += d.vx;
         d.y += d.vy;
 
-                if (d.y > canvas.height || d.x < -50 || d.x > canvas.width + 50) {
-          // Neu einspawnen: oben ODER rechts, damit unten rechts auch Regen ist
-                    if (Math.random() < 0.7) { // häufiger von oben, weniger von rechts
-            // von oben
+        if (d.y > canvas.height || d.x < -50 || d.x > canvas.width + 50) {
+          if (Math.random() < 0.7) {
             d.y = -20;
             d.x = Math.random() * canvas.width;
           } else {
-                        // von rechts (reduzierte Dichte)
             d.x = canvas.width + 20;
             d.y = Math.random() * canvas.height * 0.5;
           }
