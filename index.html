@@ -6,10 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-  /* ========== Reset / Grundlayout ========== */
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
@@ -21,38 +18,29 @@
     align-items: center;
     overflow: hidden;
 
-    /* Fallback (wird von Media Queries überschrieben) */
+    /* Basis – wird von Media Queries überschrieben */
     background-color: #000;
     background-repeat: no-repeat;
-    background-size: cover;
     background-position: center center;
+    background-size: cover;
   }
 
-  /* ========== MOBILE ========== */
+  /* ===== MOBILE ===== */
   @media (max-width: 768px) {
     body {
       background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
-      background-repeat: no-repeat;
-      /* Ganzes Bild sichtbar, nichts mehr abgeschnitten */
-      background-size: contain;
+      background-size: contain; /* nichts abschneiden */
       background-position: center bottom;
-      background-color: #000; /* ggf. Ränder auffüllen */
     }
 
-    .countdown {
-      bottom: 2%;
-    }
+    .countdown { bottom: 2%; }
   }
 
-    .countdown {
-      bottom: 2%;
-    }
-  }
-
-  /* ========== DESKTOP ========== */
+  /* ===== DESKTOP ===== */
   @media (min-width: 769px) {
     body {
       background-image: url("schimmelreiter-landscape-1380x575.jpg");
+      background-size: cover;
       background-position: center center;
     }
 
@@ -62,7 +50,7 @@
     }
   }
 
-  /* ========== Countdown (Glass) ========== */
+  /* ===== Countdown (Glass) ===== */
   .countdown {
     position: absolute;
     bottom: 10%;
@@ -78,12 +66,9 @@
     text-align: center;
   }
 
-  .time {
-    font-size: 2.2rem;
-    line-height: 1.4;
-  }
+  .time { font-size: 2.2rem; line-height: 1.4; }
 
-  /* ========== Regen (Canvas) ========== */
+  /* ===== Regen ===== */
   canvas#rain {
     position: fixed;
     inset: 0;
