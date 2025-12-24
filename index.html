@@ -6,97 +6,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <style>
-    /* ========== Grundlayout ========== */
+  /* ========== Reset / Grundlayout ========== */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+
+    /* Fallback (wird von Media Queries überschrieben) */
+    background-color: #000;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+  }
+
+  /* ========== MOBILE ========== */
+  @media (max-width: 768px) {
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      margin: 0;
-      height: 100vh;
-      color: #fff;
-      background: #000;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
+      background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
+      /* Person links sichtbar halten */
+      background-position: left center;
     }
 
-    /* ========== Hintergrundbilder ========== */
-    @media (max-width: 768px) {
-      body {
-        background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
-        background-repeat: no-repeat;
-        background-size: cover;
-        /* Bild nach LINKS verschieben, damit linke Person sichtbar bleibt */
-        background-position: 30% 50%;
-      }
-
-      .countdown {
-        bottom: 2%;
-      }
-    }
-
-      .countdown {
-        bottom: 2%;
-      }
-    }
-
-    @media (min-width: 769px) {
-      body {
-        background-image: url("schimmelreiter-landscape-1380x575.jpg");
-        background-repeat: no-repeat;
-        background-size: cover;
-        background-position: center center;
-      }
-    } {
-      body {
-        background: url("schimmelreiter-landscape-1380x575.jpg") no-repeat center center fixed;
-        background-size: cover;
-      }
-    }
-
-    /* ========== Countdown-Box (Glass) ========== */
     .countdown {
-      position: absolute;
-      bottom: 10%;
-      max-width: 90%;
-      padding: 20px 30px;
-      text-align: center;
-      background: rgba(0, 0, 0, 0.45);
-      backdrop-filter: blur(10px) saturate(120%);
-      -webkit-backdrop-filter: blur(10px) saturate(120%);
-      border-radius: 14px;
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      z-index: 2;
+      bottom: 2%;
+    }
+  }
+
+  /* ========== DESKTOP ========== */
+  @media (min-width: 769px) {
+    body {
+      background-image: url("schimmelreiter-landscape-1380x575.jpg");
+      background-position: center center;
     }
 
-    /* Mobil: etwas weiter nach unten */
-    @media (max-width: 768px) {
-      .countdown {
-        bottom: 2%;
-      }
+    .countdown {
+      left: 5%;
+      text-align: left;
     }
+  }
 
-    /* Desktop: links positionieren */
-    @media (min-width: 769px) {
-      .countdown {
-        left: 5%;
-        text-align: left;
-      }
-    }
+  /* ========== Countdown (Glass) ========== */
+  .countdown {
+    position: absolute;
+    bottom: 10%;
+    max-width: 90%;
+    padding: 20px 30px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    z-index: 2;
+    text-align: center;
+  }
 
-    .time {
-      font-size: 2.2rem;
-      line-height: 1.4;
-    }
+  .time {
+    font-size: 2.2rem;
+    line-height: 1.4;
+  }
 
-    /* ========== Regen (Canvas) ========== */
-    canvas#rain {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 1;
-    }
-  </style>
+  /* ========== Regen (Canvas) ========== */
+  canvas#rain {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+  }
+</style>
 </head>
 
 <body>
