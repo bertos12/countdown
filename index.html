@@ -6,7 +6,6 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
-/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -19,14 +18,12 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* BACKGROUND */
 body {
   min-height: 100vh;
   background-image: url("schimmelreiter_desktop.jpg");
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-
   display: flex;
   justify-content: center;
   align-items: flex-end;
@@ -40,7 +37,6 @@ body {
   }
 }
 
-/* RAIN */
 #rain {
   position: fixed;
   inset: 0;
@@ -48,7 +44,6 @@ body {
   z-index: 2;
 }
 
-/* WRAPPER */
 .countdown-wrapper {
   width: 100%;
   display: flex;
@@ -59,7 +54,6 @@ body {
   z-index: 10;
 }
 
-/* GLASS BOX */
 .glass-box {
   padding: 16px 18px;
   background: rgba(20,20,30,0.55);
@@ -70,27 +64,6 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
-/* CHRISTMAS GLOW */
-.christmas-glow {
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%,100% {
-    box-shadow:
-      0 0 12px rgba(255,80,80,0.5),
-      0 0 28px rgba(255,120,80,0.35),
-      0 0 55px rgba(255,200,120,0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 22px rgba(255,100,100,0.8),
-      0 0 45px rgba(255,160,100,0.6),
-      0 0 80px rgba(255,220,160,0.5);
-  }
-}
-
-/* COUNTDOWN */
 .countdown {
   display: flex;
   gap: 14px;
@@ -113,11 +86,29 @@ body {
   opacity: 0.8;
 }
 
-/* CHRISTMAS BOX */
+/* CHRISTMAS */
 .christmas-box {
   font-size: 1.4rem;
   font-weight: bold;
-  letter-spacing: 1px;
+}
+
+.christmas-glow {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,100% {
+    box-shadow:
+      0 0 12px rgba(255,80,80,0.5),
+      0 0 28px rgba(255,120,80,0.35),
+      0 0 55px rgba(255,200,120,0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(255,100,100,0.8),
+      0 0 45px rgba(255,160,100,0.6),
+      0 0 80px rgba(255,220,160,0.5);
+  }
 }
 </style>
 </head>
@@ -128,12 +119,10 @@ body {
 
 <div class="countdown-wrapper">
 
-  <!-- 🎄 WEIHNACHTSBOX -->
   <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
     🎄 Frohe Weihnachten 🎄
   </div>
 
-  <!-- ⏳ COUNTDOWN -->
   <div class="glass-box countdown">
     <div class="time"><span id="days">0</span><label>TAGE</label></div>
     <div class="time"><span id="hours">00</span><label>STD</label></div>
@@ -145,7 +134,14 @@ body {
 
 <script>
 /* ======================================================
-   RAIN – EDGE-BASED SPAWN (STABIL)
+   HELPERS
+====================================================== */
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
+/* ======================================================
+   RAIN – FINAL (Mobile schneller)
 ====================================================== */
 const canvas = document.getElementById("rain");
 const ctx = canvas.getContext("2d");
@@ -157,30 +153,39 @@ const GRAVITY_Y = 6.5;
 function resize() {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
-  const density = Math.floor(w / (window.innerWidth <= 768 ? 4 : 8));
+
+  const density = Math.floor(w / (isMobile() ? 4 : 8));
   drops = Array.from({ length: density }, createDrop);
 }
+
 window.addEventListener("resize", resize);
 resize();
 
 function createDrop() {
-  const vx = WIND_X + Math.random() * -1.2;
-  const vy = GRAVITY_Y + Math.random() * 2.5;
-  const len = window.innerWidth <= 768 ? 18 + Math.random()*28 : 14 + Math.random()*24;
+  const vx = WIND_X + Math.random() * (isMobile() ? -1.6 : -1.2);
+
+  const vy = (isMobile()
+    ? GRAVITY_Y + 3 + Math.random() * 3.5   // 🔥 MOBILE SCHNELLER
+    : GRAVITY_Y + Math.random() * 2.5);
+
+  const len = isMobile()
+    ? 20 + Math.random() * 30
+    : 14 + Math.random() * 24;
+
   const mag = Math.hypot(vx, vy);
   let x, y;
 
   if (vy > 0 && vx < 0) {
     if (Math.random() < h / (w + h)) {
       x = Math.random() * w;
-      y = -60;
+      y = -80;
     } else {
-      x = w + 60;
+      x = w + 80;
       y = Math.random() * h;
     }
   } else {
     x = Math.random() * w;
-    y = -60;
+    y = -80;
   }
 
   return { x, y, vx, vy, nx: vx/mag, ny: vy/mag, len };
@@ -189,22 +194,24 @@ function createDrop() {
 function rain() {
   ctx.clearRect(0,0,w,h);
   ctx.strokeStyle = "rgba(180,190,255,0.55)";
-  ctx.lineWidth = window.innerWidth <= 768 ? 1.2 : 1;
+  ctx.lineWidth = isMobile() ? 1.2 : 1;
 
   ctx.beginPath();
   for (const d of drops) {
     ctx.moveTo(d.x, d.y);
     ctx.lineTo(d.x - d.nx*d.len, d.y - d.ny*d.len);
+
     d.x += d.vx;
     d.y += d.vy;
 
-    if (d.y > h+120 || d.x < -120 || d.x > w+120) {
+    if (d.y > h+140 || d.x < -140 || d.x > w+140) {
       Object.assign(d, createDrop());
     }
   }
   ctx.stroke();
   requestAnimationFrame(rain);
 }
+
 rain();
 
 /* ======================================================
@@ -234,9 +241,9 @@ function updateCountdown() {
   document.getElementById("hours").textContent =
     String(Math.max(0, Math.floor(diff/3600000)%24)).padStart(2,"0");
   document.getElementById("minutes").textContent =
-    String(Math.max(0, Math.floor(diff/60000)%60)).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff/60000)%60))).padStart(2,"0");
   document.getElementById("seconds").textContent =
-    String(Math.max(0, Math.floor(diff/1000)%60)).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff/1000)%60))).padStart(2,"0");
 }
 
 updateChristmasBox();
