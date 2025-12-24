@@ -6,6 +6,9 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
+/* =====================
+   RESET
+===================== */
 * {
   margin: 0;
   padding: 0;
@@ -18,7 +21,9 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* BACKGROUND */
+/* =====================
+   BACKGROUND
+===================== */
 body {
   min-height: 100vh;
   background-image: url("schimmelreiter_desktop.jpg");
@@ -39,7 +44,9 @@ body {
   }
 }
 
-/* WRAPPER */
+/* =====================
+   WRAPPER
+===================== */
 .countdown-wrapper {
   width: 100%;
   display: flex;
@@ -56,7 +63,9 @@ body {
   }
 }
 
-/* GLASS BOX */
+/* =====================
+   GLASS BOX (shared)
+===================== */
 .glass-box {
   position: relative;
   padding: 24px 32px;
@@ -90,7 +99,35 @@ body {
   mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
 }
 
-/* COUNTDOWN */
+/* =====================
+   CHRISTMAS GLOW
+===================== */
+.christmas-glow {
+  animation: glowPulse 3s ease-in-out infinite;
+  box-shadow:
+    0 0 15px rgba(255, 80, 80, 0.6),
+    0 0 30px rgba(255, 120, 80, 0.4),
+    0 0 60px rgba(255, 200, 120, 0.3);
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(255, 80, 80, 0.5),
+      0 0 28px rgba(255, 120, 80, 0.35),
+      0 0 55px rgba(255, 200, 120, 0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(255, 100, 100, 0.8),
+      0 0 45px rgba(255, 160, 100, 0.6),
+      0 0 80px rgba(255, 220, 160, 0.5);
+  }
+}
+
+/* =====================
+   COUNTDOWN
+===================== */
 .countdown {
   display: flex;
   gap: 24px;
@@ -111,14 +148,18 @@ body {
   opacity: 0.8;
 }
 
-/* CHRISTMAS BOX */
+/* =====================
+   CHRISTMAS BOX
+===================== */
 .christmas-box {
   font-size: 1.8rem;
   font-weight: bold;
   letter-spacing: 1px;
 }
 
-/* MOBILE */
+/* =====================
+   MOBILE
+===================== */
 @media (max-width: 480px) {
   .glass-box {
     padding: 16px 18px;
@@ -170,17 +211,23 @@ const targetDate = new Date(2026, 6, 8, 19, 30, 0);
 
 function isChristmasToday() {
   const now = new Date();
-
   return (
     now.getFullYear() === 2025 &&
-    now.getMonth() === 11 && // Dezember
+    now.getMonth() === 11 &&
     now.getDate() === 24
   );
 }
 
 function updateChristmasBox() {
   const box = document.getElementById("christmasBox");
-  box.style.display = isChristmasToday() ? "flex" : "none";
+
+  if (isChristmasToday()) {
+    box.style.display = "flex";
+    box.classList.add("christmas-glow");
+  } else {
+    box.style.display = "none";
+    box.classList.remove("christmas-glow");
+  }
 }
 
 function updateCountdown() {
@@ -188,7 +235,8 @@ function updateCountdown() {
   const diff = targetDate - now;
 
   if (diff <= 0) {
-    document.getElementById("countdown").innerHTML = "<strong>Jetzt live!</strong>";
+    document.getElementById("countdown").innerHTML =
+      "<strong>Jetzt live!</strong>";
     return;
   }
 
@@ -202,7 +250,7 @@ function updateCountdown() {
     String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
 }
 
-/* INIT + LIVE UPDATES */
+/* INIT + LIVE */
 updateChristmasBox();
 updateCountdown();
 setInterval(() => {
