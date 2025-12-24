@@ -39,7 +39,9 @@ body {
   overflow: hidden;
 }
 
-/* MOBILE BACKGROUND */
+/* =====================
+   MOBILE BACKGROUND
+===================== */
 @media (max-width: 768px) {
   body {
     background-image: url("schimmelreiter_mobil.jpg");
@@ -54,8 +56,15 @@ body {
   width: 100%;
   display: flex;
   justify-content: center;
-  padding-bottom: 5vh;
+  padding-bottom: 5vh; /* Desktop */
   z-index: 10;
+}
+
+/* 🔧 MOBILE: Countdown höher platzieren */
+@media (max-width: 768px) {
+  .countdown-wrapper {
+    padding-bottom: 12vh;
+  }
 }
 
 /* =====================
@@ -177,12 +186,12 @@ body {
   08.07.2026 – 19:30 Uhr (lokale Zeit)
 */
 const targetDate = new Date(
-  2026, // Jahr
-  6,    // Monat (0 = Jan, 6 = Juli)
-  8,    // Tag
-  19,   // Stunde
-  30,   // Minute
-  0     // Sekunde
+  2026,
+  6,
+  8,
+  19,
+  30,
+  0
 );
 
 function updateCountdown() {
