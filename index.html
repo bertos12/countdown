@@ -87,28 +87,30 @@ body {
   opacity:0.8;
 }
 
-/* CHRISTMAS */
-.christmas-box {
+/* SPECIAL DAY BOX */
+.special-box {
   font-size:1.4rem;
   font-weight:bold;
+  letter-spacing:0.5px;
 }
 
-.christmas-glow {
+/* GLOW */
+.special-glow {
   animation: glowPulse 3s ease-in-out infinite;
 }
 
 @keyframes glowPulse {
   0%,100% {
     box-shadow:
-      0 0 12px rgba(255,80,80,0.5),
-      0 0 28px rgba(255,120,80,0.35),
-      0 0 55px rgba(255,200,120,0.25);
+      0 0 12px rgba(255,120,120,0.5),
+      0 0 28px rgba(255,160,120,0.35),
+      0 0 55px rgba(255,220,160,0.25);
   }
   50% {
     box-shadow:
-      0 0 22px rgba(255,100,100,0.8),
-      0 0 45px rgba(255,160,100,0.6),
-      0 0 80px rgba(255,220,160,0.5);
+      0 0 22px rgba(255,150,150,0.8),
+      0 0 45px rgba(255,190,140,0.6),
+      0 0 80px rgba(255,230,180,0.5);
   }
 }
 </style>
@@ -120,9 +122,9 @@ body {
 
 <div class="countdown-wrapper">
 
-  <!-- 🎄 WEIHNACHT -->
-  <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
-    🎄 Frohe Weihnachten 🎄
+  <!-- 🎉 GEBURTSTAGSBOX -->
+  <div class="glass-box special-box" id="birthdayBox" style="display:none;">
+    🎉 Herzlichen Glückwunsch zum Geburtstag 🎉
   </div>
 
   <!-- ⏳ COUNTDOWN -->
@@ -137,7 +139,7 @@ body {
 
 <script>
 /* =====================
-   HELPERS
+   HELPER
 ===================== */
 function isMobile() {
   return window.innerWidth <= 768;
@@ -213,23 +215,27 @@ function rain() {
 rain();
 
 /* =====================
-   CHRISTMAS + COUNTDOWN
+   BIRTHDAY + COUNTDOWN
 ===================== */
 const targetDate = new Date(2026,6,8,19,30,0);
 
-function isChristmasToday() {
+function isBirthdayToday() {
   const n = new Date();
-  return n.getFullYear() === 2025 && n.getMonth() === 11 && n.getDate() === 24;
+  return (
+    n.getFullYear() === 2025 &&
+    n.getMonth() === 11 && // Dezember
+    n.getDate() === 25
+  );
 }
 
-function updateChristmasBox() {
-  const box = document.getElementById("christmasBox");
-  if (isChristmasToday()) {
+function updateBirthdayBox() {
+  const box = document.getElementById("birthdayBox");
+  if (isBirthdayToday()) {
     box.style.display = "block";
-    box.classList.add("christmas-glow");
+    box.classList.add("special-glow");
   } else {
     box.style.display = "none";
-    box.classList.remove("christmas-glow");
+    box.classList.remove("special-glow");
   }
 }
 
@@ -249,10 +255,10 @@ function updateCountdown() {
     String(Math.max(0, Math.floor(diff / 1000) % 60)).padStart(2,"0");
 }
 
-updateChristmasBox();
+updateBirthdayBox();
 updateCountdown();
 setInterval(() => {
-  updateChristmasBox();
+  updateBirthdayBox();
   updateCountdown();
 }, 1000);
 </script>
