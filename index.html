@@ -32,9 +32,17 @@
   @media (max-width: 768px) {
     body {
       background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
-      /* Person links sichtbar halten */
-      background-position: left center;
+      background-repeat: no-repeat;
+      /* Ganzes Bild sichtbar, nichts mehr abgeschnitten */
+      background-size: contain;
+      background-position: center bottom;
+      background-color: #000; /* ggf. Ränder auffüllen */
     }
+
+    .countdown {
+      bottom: 2%;
+    }
+  }
 
     .countdown {
       bottom: 2%;
