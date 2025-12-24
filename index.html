@@ -29,13 +29,16 @@
   /* ===== MOBILE ===== */
   @media (max-width: 768px) {
     body {
-      /* MOBILE – sichtbar andere Einstellungen */
+      /* DEBUG: diese Farbe MUSS sichtbar sein, sonst wird altes CSS geladen */
+      background-color: #550000;
       background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
       background-repeat: no-repeat;
-      background-size: contain; /* KEIN Zoom mehr */
-      background-position: center top; /* klar sichtbar andere Position */
-      background-color: #000;
+      background-size: contain;
+      background-position: center center;
     }
+
+    .countdown { bottom: 1.5%; }
+  }
 
     .countdown {
       bottom: 1.5%;
