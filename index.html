@@ -78,7 +78,6 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
-/* Spiegel */
 .glass-box::after {
   content: "";
   position: absolute;
@@ -94,26 +93,6 @@ body {
   mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
 }
 
-/* CHRISTMAS GLOW */
-.christmas-glow {
-  animation: glowPulse 3s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%, 100% {
-    box-shadow:
-      0 0 12px rgba(255, 80, 80, 0.5),
-      0 0 28px rgba(255, 120, 80, 0.35),
-      0 0 55px rgba(255, 200, 120, 0.25);
-  }
-  50% {
-    box-shadow:
-      0 0 22px rgba(255, 100, 100, 0.8),
-      0 0 45px rgba(255, 160, 100, 0.6),
-      0 0 80px rgba(255, 220, 160, 0.5);
-  }
-}
-
 /* COUNTDOWN */
 .countdown {
   display: flex;
@@ -122,9 +101,9 @@ body {
 
 .time {
   min-width: 70px;
-  display: flex;                 /* ← FIX */
-  flex-direction: column;        /* ← FIX */
-  align-items: center;           /* ← FIX */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .time span {
@@ -137,18 +116,10 @@ body {
   opacity: 0.8;
 }
 
-/* CHRISTMAS BOX */
-.christmas-box {
-  font-size: 1.8rem;
-  font-weight: bold;
-  letter-spacing: 1px;
-}
-
 /* MOBILE */
 @media (max-width: 480px) {
   .glass-box { padding: 16px 18px; }
   .time span { font-size: 1.6rem; }
-  .christmas-box { font-size: 1.4rem; }
 }
 </style>
 </head>
@@ -158,46 +129,47 @@ body {
 <canvas id="rain"></canvas>
 
 <div class="countdown-wrapper">
-
-  <!-- 🎄 WEIHNACHTSBOX -->
-  <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
-    🎄 Frohe Weihnachten 🎄
-  </div>
-
-  <!-- ⏳ COUNTDOWN -->
   <div class="glass-box countdown" id="countdown">
     <div class="time"><span id="days">0</span><label>TAGE</label></div>
     <div class="time"><span id="hours">00</span><label>STD</label></div>
     <div class="time"><span id="minutes">00</span><label>MIN</label></div>
     <div class="time"><span id="seconds">00</span><label>SEK</label></div>
   </div>
-
 </div>
 
 <script>
 /* =====================
-   RAIN – vollflächig
+   RAIN – MOBILE FIX
 ===================== */
 const canvas = document.getElementById("rain");
 const ctx = canvas.getContext("2d");
 
-let w, h;
-let drops = [];
+let w, h, drops = [];
 
+// Wind & Fall
 const WIND_X = -4.0;
 const GRAVITY_Y = 6.5;
+
+function isMobile() {
+  return window.innerWidth <= 768;
+}
 
 function resize() {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
 
-  const spawnX = Math.abs(WIND_X) * 180;
-  const spawnY = GRAVITY_Y * 60;
+  // 🔧 Mobile: dichter & größere Spawn-Zone
+  const densityDivisor = isMobile() ? 5 : 9;
+  const spawnX = Math.abs(WIND_X) * (isMobile() ? 260 : 180);
+  const spawnY = GRAVITY_Y * (isMobile() ? 120 : 60);
 
-  drops = Array.from({ length: Math.floor(w / 9) }, () => {
-    const vx = WIND_X + Math.random() * -1.2;
-    const vy = GRAVITY_Y + Math.random() * 2.5;
-    const len = 14 + Math.random() * 24;
+  drops = Array.from({ length: Math.floor(w / densityDivisor) }, () => {
+    const vx = WIND_X + Math.random() * -1.5;
+    const vy = GRAVITY_Y + Math.random() * 3;
+    const len = isMobile()
+      ? 18 + Math.random() * 28
+      : 14 + Math.random() * 24;
+
     const mag = Math.hypot(vx, vy);
 
     return {
@@ -216,19 +188,22 @@ resize();
 function rain() {
   ctx.clearRect(0, 0, w, h);
   ctx.strokeStyle = "rgba(180,190,255,0.55)";
-  ctx.lineWidth = 1;
+  ctx.lineWidth = isMobile() ? 1.2 : 1;
 
   ctx.beginPath();
   for (const d of drops) {
     ctx.moveTo(d.x, d.y);
-    ctx.lineTo(d.x - d.nx * d.len, d.y - d.ny * d.len);
+    ctx.lineTo(
+      d.x - d.nx * d.len,
+      d.y - d.ny * d.len
+    );
 
     d.x += d.vx;
     d.y += d.vy;
 
-    if (d.y > h + 120 || d.x < -300) {
-      d.y = -Math.random() * 120;
-      d.x = Math.random() * (w + 300) + 300;
+    if (d.y > h + 160 || d.x < -350) {
+      d.y = -Math.random() * 180;
+      d.x = Math.random() * (w + 420) + 420;
     }
   }
   ctx.stroke();
@@ -238,29 +213,12 @@ function rain() {
 rain();
 
 /* =====================
-   COUNTDOWN + CHRISTMAS
+   COUNTDOWN
 ===================== */
 const targetDate = new Date(2026, 6, 8, 19, 30, 0);
 
-function isChristmasToday() {
-  const n = new Date();
-  return n.getFullYear() === 2025 && n.getMonth() === 11 && n.getDate() === 24;
-}
-
-function updateChristmasBox() {
-  const box = document.getElementById("christmasBox");
-  if (isChristmasToday()) {
-    box.style.display = "flex";
-    box.classList.add("christmas-glow");
-  } else {
-    box.style.display = "none";
-    box.classList.remove("christmas-glow");
-  }
-}
-
 function updateCountdown() {
-  const now = new Date();
-  const diff = targetDate - now;
+  const diff = targetDate - new Date();
 
   document.getElementById("days").textContent =
     Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
@@ -272,12 +230,8 @@ function updateCountdown() {
     String(Math.max(0, Math.floor(diff / 1000 % 60))).padStart(2, "0");
 }
 
-updateChristmasBox();
 updateCountdown();
-setInterval(() => {
-  updateChristmasBox();
-  updateCountdown();
-}, 1000);
+setInterval(updateCountdown, 1000);
 </script>
 
 </body>
