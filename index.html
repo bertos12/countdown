@@ -6,9 +6,6 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
-/* =====================
-   RESET
-===================== */
 * {
   margin: 0;
   padding: 0;
@@ -21,13 +18,9 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =====================
-   BACKGROUND
-===================== */
+/* BACKGROUND */
 body {
   min-height: 100vh;
-  position: relative;
-
   background-image: url("schimmelreiter_desktop.jpg");
   background-size: cover;
   background-position: center center;
@@ -39,7 +32,6 @@ body {
   overflow: hidden;
 }
 
-/* MOBILE BACKGROUND */
 @media (max-width: 768px) {
   body {
     background-image: url("schimmelreiter_mobil.jpg");
@@ -47,9 +39,7 @@ body {
   }
 }
 
-/* =====================
-   WRAPPER
-===================== */
+/* WRAPPER */
 .countdown-wrapper {
   width: 100%;
   display: flex;
@@ -60,20 +50,15 @@ body {
   z-index: 10;
 }
 
-/* Mobile: etwas höher */
 @media (max-width: 768px) {
   .countdown-wrapper {
     padding-bottom: 12vh;
   }
 }
 
-/* =====================
-   GLASS BOX (shared)
-===================== */
+/* GLASS BOX */
 .glass-box {
   position: relative;
-  display: flex;
-  gap: 24px;
   padding: 24px 32px;
 
   background: rgba(20, 20, 30, 0.55);
@@ -87,9 +72,7 @@ body {
   box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
-/* =====================
-   MIRROR EFFECT
-===================== */
+/* Spiegel */
 .glass-box::after {
   content: "";
   position: absolute;
@@ -97,65 +80,52 @@ body {
   right: 0;
   top: 100%;
   height: 100%;
-
   background: inherit;
+
   transform: scaleY(-1);
   opacity: 0.25;
   filter: blur(3px);
-  pointer-events: none;
 
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.4),
-    transparent
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    rgba(0,0,0,0.4),
-    transparent
-  );
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
 }
 
-/* =====================
-   COUNTDOWN
-===================== */
+/* COUNTDOWN */
+.countdown {
+  display: flex;
+  gap: 24px;
+}
+
 .time {
   min-width: 70px;
 }
 
 .time span {
-  display: block;
   font-size: 2.2rem;
   font-weight: bold;
+  display: block;
 }
 
 .time label {
   font-size: 0.75rem;
   opacity: 0.8;
-  letter-spacing: 1px;
 }
 
-/* =====================
-   CHRISTMAS BOX
-===================== */
+/* CHRISTMAS BOX */
 .christmas-box {
   font-size: 1.8rem;
   font-weight: bold;
   letter-spacing: 1px;
 }
 
-/* =====================
-   MOBILE TUNING
-===================== */
+/* MOBILE */
 @media (max-width: 480px) {
   .glass-box {
     padding: 16px 18px;
   }
-
   .time span {
     font-size: 1.6rem;
   }
-
   .christmas-box {
     font-size: 1.4rem;
   }
@@ -165,18 +135,15 @@ body {
 
 <body>
 
-<!-- =====================
-     WRAPPER
-===================== -->
 <div class="countdown-wrapper">
 
-  <!-- 🎄 CHRISTMAS BOX (hidden by default) -->
+  <!-- 🎄 WEIHNACHTSBOX -->
   <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
     🎄 Frohe Weihnachten 🎄
   </div>
 
   <!-- ⏳ COUNTDOWN -->
-  <div class="glass-box" id="countdown">
+  <div class="glass-box countdown" id="countdown">
     <div class="time">
       <span id="days">0</span>
       <label>TAGE</label>
@@ -197,15 +164,52 @@ body {
 
 </div>
 
-<!-- =====================
-     SCRIPT
-===================== -->
 <script>
-/*
-  Countdown-Ziel:
-  08.07.2026 – 19:30 Uhr
-*/
+/* Ziel: 08.07.2026 – 19:30 */
 const targetDate = new Date(2026, 6, 8, 19, 30, 0);
 
-/*
-  Wei
+function isChristmasToday() {
+  const now = new Date();
+
+  return (
+    now.getFullYear() === 2025 &&
+    now.getMonth() === 11 && // Dezember
+    now.getDate() === 24
+  );
+}
+
+function updateChristmasBox() {
+  const box = document.getElementById("christmasBox");
+  box.style.display = isChristmasToday() ? "flex" : "none";
+}
+
+function updateCountdown() {
+  const now = new Date();
+  const diff = targetDate - now;
+
+  if (diff <= 0) {
+    document.getElementById("countdown").innerHTML = "<strong>Jetzt live!</strong>";
+    return;
+  }
+
+  document.getElementById("days").textContent =
+    Math.floor(diff / (1000 * 60 * 60 * 24));
+  document.getElementById("hours").textContent =
+    String(Math.floor(diff / (1000 * 60 * 60) % 24)).padStart(2, "0");
+  document.getElementById("minutes").textContent =
+    String(Math.floor(diff / (1000 * 60) % 60)).padStart(2, "0");
+  document.getElementById("seconds").textContent =
+    String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
+}
+
+/* INIT + LIVE UPDATES */
+updateChristmasBox();
+updateCountdown();
+setInterval(() => {
+  updateChristmasBox();
+  updateCountdown();
+}, 1000);
+</script>
+
+</body>
+</html>
