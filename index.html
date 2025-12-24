@@ -18,11 +18,12 @@
     align-items: center;
     overflow: hidden;
 
-    /* Basis – wird von Media Queries überschrieben */
-    background-color: #000;
+    /* Basis-Hintergrund (Desktop-Fallback) */
+    background-image: url("schimmelreiter-landscape-1380x575.jpg");
     background-repeat: no-repeat;
     background-position: center center;
     background-size: cover;
+  }
   }
 
   /* ===== MOBILE ===== */
@@ -30,11 +31,15 @@
     body {
       background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
       background-repeat: no-repeat;
-      /* Volle Fläche ohne schwarze Ränder */
       background-size: cover;
-      /* Kompromiss-Ausschnitt: möglichst wenig Abschneiden links/rechts */
       background-position: 50% 45%;
     }
+
+    /* Countdown auf Mobil weiter nach unten */
+    .countdown {
+      bottom: 1.5%;
+    }
+  }
 
     .countdown {
       bottom: 2%;
