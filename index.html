@@ -6,9 +6,7 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
-/* =====================
-   RESET
-===================== */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -21,9 +19,7 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* =====================
-   BACKGROUND
-===================== */
+/* BACKGROUND */
 body {
   min-height: 100vh;
   background-image: url("schimmelreiter_desktop.jpg");
@@ -44,9 +40,15 @@ body {
   }
 }
 
-/* =====================
-   WRAPPER
-===================== */
+/* RAIN CANVAS */
+#rain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* WRAPPER */
 .countdown-wrapper {
   width: 100%;
   display: flex;
@@ -63,21 +65,16 @@ body {
   }
 }
 
-/* =====================
-   GLASS BOX (shared)
-===================== */
+/* GLASS BOX */
 .glass-box {
   position: relative;
   padding: 24px 32px;
-
   background: rgba(20, 20, 30, 0.55);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
   border-radius: 16px;
   color: #fff;
   text-align: center;
-
   box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
@@ -90,24 +87,16 @@ body {
   top: 100%;
   height: 100%;
   background: inherit;
-
   transform: scaleY(-1);
   opacity: 0.25;
   filter: blur(3px);
-
   -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
   mask-image: linear-gradient(to bottom, rgba(0,0,0,0.4), transparent);
 }
 
-/* =====================
-   CHRISTMAS GLOW
-===================== */
+/* CHRISTMAS GLOW */
 .christmas-glow {
   animation: glowPulse 3s ease-in-out infinite;
-  box-shadow:
-    0 0 15px rgba(255, 80, 80, 0.6),
-    0 0 30px rgba(255, 120, 80, 0.4),
-    0 0 60px rgba(255, 200, 120, 0.3);
 }
 
 @keyframes glowPulse {
@@ -125,9 +114,7 @@ body {
   }
 }
 
-/* =====================
-   COUNTDOWN
-===================== */
+/* COUNTDOWN */
 .countdown {
   display: flex;
   gap: 24px;
@@ -135,12 +122,14 @@ body {
 
 .time {
   min-width: 70px;
+  display: flex;                 /* ← FIX */
+  flex-direction: column;        /* ← FIX */
+  align-items: center;           /* ← FIX */
 }
 
 .time span {
   font-size: 2.2rem;
   font-weight: bold;
-  display: block;
 }
 
 .time label {
@@ -148,33 +137,25 @@ body {
   opacity: 0.8;
 }
 
-/* =====================
-   CHRISTMAS BOX
-===================== */
+/* CHRISTMAS BOX */
 .christmas-box {
   font-size: 1.8rem;
   font-weight: bold;
   letter-spacing: 1px;
 }
 
-/* =====================
-   MOBILE
-===================== */
+/* MOBILE */
 @media (max-width: 480px) {
-  .glass-box {
-    padding: 16px 18px;
-  }
-  .time span {
-    font-size: 1.6rem;
-  }
-  .christmas-box {
-    font-size: 1.4rem;
-  }
+  .glass-box { padding: 16px 18px; }
+  .time span { font-size: 1.6rem; }
+  .christmas-box { font-size: 1.4rem; }
 }
 </style>
 </head>
 
 <body>
+
+<canvas id="rain"></canvas>
 
 <div class="countdown-wrapper">
 
@@ -185,42 +166,89 @@ body {
 
   <!-- ⏳ COUNTDOWN -->
   <div class="glass-box countdown" id="countdown">
-    <div class="time">
-      <span id="days">0</span>
-      <label>TAGE</label>
-    </div>
-    <div class="time">
-      <span id="hours">00</span>
-      <label>STD</label>
-    </div>
-    <div class="time">
-      <span id="minutes">00</span>
-      <label>MIN</label>
-    </div>
-    <div class="time">
-      <span id="seconds">00</span>
-      <label>SEK</label>
-    </div>
+    <div class="time"><span id="days">0</span><label>TAGE</label></div>
+    <div class="time"><span id="hours">00</span><label>STD</label></div>
+    <div class="time"><span id="minutes">00</span><label>MIN</label></div>
+    <div class="time"><span id="seconds">00</span><label>SEK</label></div>
   </div>
 
 </div>
 
 <script>
-/* Ziel: 08.07.2026 – 19:30 */
+/* =====================
+   RAIN – vollflächig
+===================== */
+const canvas = document.getElementById("rain");
+const ctx = canvas.getContext("2d");
+
+let w, h;
+let drops = [];
+
+const WIND_X = -4.0;
+const GRAVITY_Y = 6.5;
+
+function resize() {
+  w = canvas.width = window.innerWidth;
+  h = canvas.height = window.innerHeight;
+
+  const spawnX = Math.abs(WIND_X) * 180;
+  const spawnY = GRAVITY_Y * 60;
+
+  drops = Array.from({ length: Math.floor(w / 9) }, () => {
+    const vx = WIND_X + Math.random() * -1.2;
+    const vy = GRAVITY_Y + Math.random() * 2.5;
+    const len = 14 + Math.random() * 24;
+    const mag = Math.hypot(vx, vy);
+
+    return {
+      x: Math.random() * (w + spawnX) + spawnX,
+      y: Math.random() * (h + spawnY) - spawnY,
+      vx, vy, len,
+      nx: vx / mag,
+      ny: vy / mag
+    };
+  });
+}
+
+window.addEventListener("resize", resize);
+resize();
+
+function rain() {
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = "rgba(180,190,255,0.55)";
+  ctx.lineWidth = 1;
+
+  ctx.beginPath();
+  for (const d of drops) {
+    ctx.moveTo(d.x, d.y);
+    ctx.lineTo(d.x - d.nx * d.len, d.y - d.ny * d.len);
+
+    d.x += d.vx;
+    d.y += d.vy;
+
+    if (d.y > h + 120 || d.x < -300) {
+      d.y = -Math.random() * 120;
+      d.x = Math.random() * (w + 300) + 300;
+    }
+  }
+  ctx.stroke();
+  requestAnimationFrame(rain);
+}
+
+rain();
+
+/* =====================
+   COUNTDOWN + CHRISTMAS
+===================== */
 const targetDate = new Date(2026, 6, 8, 19, 30, 0);
 
 function isChristmasToday() {
-  const now = new Date();
-  return (
-    now.getFullYear() === 2025 &&
-    now.getMonth() === 11 &&
-    now.getDate() === 24
-  );
+  const n = new Date();
+  return n.getFullYear() === 2025 && n.getMonth() === 11 && n.getDate() === 24;
 }
 
 function updateChristmasBox() {
   const box = document.getElementById("christmasBox");
-
   if (isChristmasToday()) {
     box.style.display = "flex";
     box.classList.add("christmas-glow");
@@ -234,23 +262,16 @@ function updateCountdown() {
   const now = new Date();
   const diff = targetDate - now;
 
-  if (diff <= 0) {
-    document.getElementById("countdown").innerHTML =
-      "<strong>Jetzt live!</strong>";
-    return;
-  }
-
   document.getElementById("days").textContent =
-    Math.floor(diff / (1000 * 60 * 60 * 24));
+    Math.max(0, Math.floor(diff / (1000 * 60 * 60 * 24)));
   document.getElementById("hours").textContent =
-    String(Math.floor(diff / (1000 * 60 * 60) % 24)).padStart(2, "0");
+    String(Math.max(0, Math.floor(diff / (1000 * 60 * 60) % 24))).padStart(2, "0");
   document.getElementById("minutes").textContent =
-    String(Math.floor(diff / (1000 * 60) % 60)).padStart(2, "0");
+    String(Math.max(0, Math.floor(diff / (1000 * 60) % 60))).padStart(2, "0");
   document.getElementById("seconds").textContent =
-    String(Math.floor(diff / 1000 % 60)).padStart(2, "0");
+    String(Math.max(0, Math.floor(diff / 1000 % 60))).padStart(2, "0");
 }
 
-/* INIT + LIVE */
 updateChristmasBox();
 updateCountdown();
 setInterval(() => {
