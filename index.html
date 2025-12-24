@@ -6,6 +6,7 @@
 <title>Der Schimmelreiter – Countdown</title>
 
 <style>
+/* RESET */
 * {
   margin: 0;
   padding: 0;
@@ -18,6 +19,7 @@ html, body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* BACKGROUND */
 body {
   min-height: 100vh;
   background-image: url("schimmelreiter_desktop.jpg");
@@ -38,6 +40,7 @@ body {
   }
 }
 
+/* RAIN */
 #rain {
   position: fixed;
   inset: 0;
@@ -45,22 +48,49 @@ body {
   z-index: 2;
 }
 
+/* WRAPPER */
 .countdown-wrapper {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
   padding-bottom: 12vh;
   z-index: 10;
 }
 
+/* GLASS BOX */
 .glass-box {
   padding: 16px 18px;
   background: rgba(20,20,30,0.55);
   backdrop-filter: blur(10px);
   border-radius: 16px;
   color: #fff;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
+/* CHRISTMAS GLOW */
+.christmas-glow {
+  animation: glowPulse 3s ease-in-out infinite;
+}
+
+@keyframes glowPulse {
+  0%,100% {
+    box-shadow:
+      0 0 12px rgba(255,80,80,0.5),
+      0 0 28px rgba(255,120,80,0.35),
+      0 0 55px rgba(255,200,120,0.25);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(255,100,100,0.8),
+      0 0 45px rgba(255,160,100,0.6),
+      0 0 80px rgba(255,220,160,0.5);
+  }
+}
+
+/* COUNTDOWN */
 .countdown {
   display: flex;
   gap: 14px;
@@ -82,6 +112,13 @@ body {
   font-size: 0.7rem;
   opacity: 0.8;
 }
+
+/* CHRISTMAS BOX */
+.christmas-box {
+  font-size: 1.4rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
 </style>
 </head>
 
@@ -90,120 +127,124 @@ body {
 <canvas id="rain"></canvas>
 
 <div class="countdown-wrapper">
+
+  <!-- 🎄 WEIHNACHTSBOX -->
+  <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
+    🎄 Frohe Weihnachten 🎄
+  </div>
+
+  <!-- ⏳ COUNTDOWN -->
   <div class="glass-box countdown">
     <div class="time"><span id="days">0</span><label>TAGE</label></div>
     <div class="time"><span id="hours">00</span><label>STD</label></div>
     <div class="time"><span id="minutes">00</span><label>MIN</label></div>
     <div class="time"><span id="seconds">00</span><label>SEK</label></div>
   </div>
+
 </div>
 
 <script>
 /* ======================================================
-   RAIN – EDGE-BASED SPAWN (FINAL, STABLE)
+   RAIN – EDGE-BASED SPAWN (STABIL)
 ====================================================== */
 const canvas = document.getElementById("rain");
 const ctx = canvas.getContext("2d");
 
-let w, h;
-let drops = [];
-
-const WIND_X = -4.0;   // Wind nach links
-const GRAVITY_Y = 6.5; // Fallgeschwindigkeit
+let w, h, drops = [];
+const WIND_X = -4.0;
+const GRAVITY_Y = 6.5;
 
 function resize() {
   w = canvas.width = window.innerWidth;
   h = canvas.height = window.innerHeight;
-
   const density = Math.floor(w / (window.innerWidth <= 768 ? 4 : 8));
   drops = Array.from({ length: density }, createDrop);
 }
-
 window.addEventListener("resize", resize);
 resize();
 
 function createDrop() {
   const vx = WIND_X + Math.random() * -1.2;
   const vy = GRAVITY_Y + Math.random() * 2.5;
-  const len = window.innerWidth <= 768
-    ? 18 + Math.random() * 28
-    : 14 + Math.random() * 24;
-
+  const len = window.innerWidth <= 768 ? 18 + Math.random()*28 : 14 + Math.random()*24;
   const mag = Math.hypot(vx, vy);
-  const nx = vx / mag;
-  const ny = vy / mag;
-
-  /* Eintrittskante bestimmen */
   let x, y;
-  const fromTop = vy > 0;
-  const fromRight = vx < 0;
 
-  if (fromTop && fromRight) {
-    // Eintritt oben ODER rechts
+  if (vy > 0 && vx < 0) {
     if (Math.random() < h / (w + h)) {
       x = Math.random() * w;
-      y = -50;
+      y = -60;
     } else {
-      x = w + 50;
+      x = w + 60;
       y = Math.random() * h;
     }
   } else {
     x = Math.random() * w;
-    y = -50;
+    y = -60;
   }
 
-  return { x, y, vx, vy, nx, ny, len };
+  return { x, y, vx, vy, nx: vx/mag, ny: vy/mag, len };
 }
 
 function rain() {
-  ctx.clearRect(0, 0, w, h);
+  ctx.clearRect(0,0,w,h);
   ctx.strokeStyle = "rgba(180,190,255,0.55)";
   ctx.lineWidth = window.innerWidth <= 768 ? 1.2 : 1;
 
   ctx.beginPath();
   for (const d of drops) {
     ctx.moveTo(d.x, d.y);
-    ctx.lineTo(
-      d.x - d.nx * d.len,
-      d.y - d.ny * d.len
-    );
-
+    ctx.lineTo(d.x - d.nx*d.len, d.y - d.ny*d.len);
     d.x += d.vx;
     d.y += d.vy;
 
-    if (
-      d.y > h + 100 ||
-      d.x < -100 ||
-      d.x > w + 100
-    ) {
+    if (d.y > h+120 || d.x < -120 || d.x > w+120) {
       Object.assign(d, createDrop());
     }
   }
   ctx.stroke();
   requestAnimationFrame(rain);
 }
-
 rain();
 
 /* ======================================================
-   COUNTDOWN
+   CHRISTMAS + COUNTDOWN
 ====================================================== */
-const targetDate = new Date(2026, 6, 8, 19, 30, 0);
+const targetDate = new Date(2026,6,8,19,30,0);
+
+function isChristmasToday() {
+  const n = new Date();
+  return n.getFullYear() === 2025 && n.getMonth() === 11 && n.getDate() === 24;
+}
+
+function updateChristmasBox() {
+  const box = document.getElementById("christmasBox");
+  if (isChristmasToday()) {
+    box.style.display = "block";
+    box.classList.add("christmas-glow");
+  } else {
+    box.style.display = "none";
+    box.classList.remove("christmas-glow");
+  }
+}
 
 function updateCountdown() {
   const diff = targetDate - new Date();
-  document.getElementById("days").textContent =
-    Math.max(0, Math.floor(diff / (1000*60*60*24)));
+  document.getElementById("days").textContent = Math.max(0, Math.floor(diff/86400000));
   document.getElementById("hours").textContent =
-    String(Math.max(0, Math.floor(diff / (1000*60*60)%24))).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff/3600000)%24)).padStart(2,"0");
   document.getElementById("minutes").textContent =
-    String(Math.max(0, Math.floor(diff / (1000*60)%60))).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff/60000)%60)).padStart(2,"0");
   document.getElementById("seconds").textContent =
-    String(Math.max(0, Math.floor(diff / 1000%60))).padStart(2,"0");
+    String(Math.max(0, Math.floor(diff/1000)%60)).padStart(2,"0");
 }
 
+updateChristmasBox();
 updateCountdown();
-setInterval(updateCountdown, 1000);
+setInterval(() => {
+  updateChristmasBox();
+  updateCountdown();
+}, 1000);
 </script>
 
 </body>
