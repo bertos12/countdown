@@ -1,202 +1,214 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <title>Countdown</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Der Schimmelreiter – Countdown</title>
 
-  <style>
-  * { box-sizing: border-box; }
+<style>
+/* =====================
+   RESET
+===================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
+html, body {
+  width: 100%;
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =====================
+   BACKGROUND
+===================== */
+body {
+  min-height: 100vh;
+  position: relative;
+
+  background-image: url("schimmelreiter_desktop.jpg");
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+/* MOBILE BACKGROUND */
+@media (max-width: 768px) {
   body {
-    margin: 0;
-    height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
-    color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-
-    /* Basis-Hintergrund (Desktop-Fallback) */
-    background-image: url("schimmelreiter-landscape-1380x575.jpg");
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: cover;
+    background-image: url("schimmelreiter_mobil.jpg");
+    background-position: top center;
   }
+}
+
+/* =====================
+   COUNTDOWN WRAPPER
+===================== */
+.countdown-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 5vh;
+  z-index: 10;
+}
+
+/* =====================
+   GLASS COUNTDOWN BOX
+===================== */
+.countdown-box {
+  position: relative;
+  display: flex;
+  gap: 24px;
+  padding: 24px 32px;
+
+  background: rgba(20, 20, 30, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border-radius: 16px;
+  color: #fff;
+  text-align: center;
+
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* =====================
+   MIRROR EFFECT (Firefox-safe)
+===================== */
+.countdown-box::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 100%;
+
+  background: inherit;
+  transform: scaleY(-1);
+  opacity: 0.25;
+  filter: blur(3px);
+  pointer-events: none;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.4),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.4),
+    transparent
+  );
+}
+
+/* =====================
+   TIME BLOCKS
+===================== */
+.time {
+  min-width: 70px;
+}
+
+.time span {
+  display: block;
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+.time label {
+  font-size: 0.75rem;
+  opacity: 0.8;
+  letter-spacing: 1px;
+}
+
+/* =====================
+   MOBILE TUNING
+===================== */
+@media (max-width: 480px) {
+  .countdown-box {
+    gap: 14px;
+    padding: 16px 18px;
   }
 
-  /* ===== MOBILE ===== */
-  @media (max-width: 768px) {
-    body {
-      /* DEBUG: diese Farbe MUSS sichtbar sein, sonst wird altes CSS geladen */
-      background-color: #550000;
-      background-image: url("03-schimmelreiter-musical-hero-750x750.jpg");
-      background-repeat: no-repeat;
-      background-size: contain;
-      background-position: center center;
-    }
-
-    .countdown { bottom: 1.5%; }
+  .time span {
+    font-size: 1.6rem;
   }
-
-    .countdown {
-      bottom: 1.5%;
-    }
-  }
-
-    /* Countdown auf Mobil weiter nach unten */
-    .countdown {
-      bottom: 1.5%;
-    }
-  }
-
-    /* Countdown auf Mobil weiter nach unten */
-    .countdown {
-      bottom: 1.5%;
-    }
-  }
-
-    .countdown {
-      bottom: 2%;
-    }
-  }
-
-    .countdown {
-      bottom: 2%;
-    }
-  }
-
-    .countdown { bottom: 2%; }
-  }
-
-  /* ===== DESKTOP ===== */
-  @media (min-width: 769px) {
-    body {
-      background-image: url("schimmelreiter-landscape-1380x575.jpg");
-      background-size: cover;
-      background-position: center center;
-    }
-
-    .countdown {
-      left: 5%;
-      text-align: left;
-    }
-  }
-
-  /* ===== Countdown (Glass) ===== */
-  .countdown {
-    position: absolute;
-    bottom: 10%;
-    max-width: 90%;
-    padding: 20px 30px;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    z-index: 2;
-    text-align: center;
-  }
-
-  .time { font-size: 2.2rem; line-height: 1.4; }
-
-  /* ===== Regen ===== */
-  canvas#rain {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 1;
-  }
+}
 </style>
 </head>
 
 <body>
-  <canvas id="rain"></canvas>
 
-  <div class="countdown">
-    <div class="time" id="countdown">Lade…</div>
+<!-- =====================
+     COUNTDOWN
+===================== -->
+<div class="countdown-wrapper">
+  <div class="countdown-box" id="countdown">
+    <div class="time">
+      <span id="days">0</span>
+      <label>TAGE</label>
+    </div>
+    <div class="time">
+      <span id="hours">00</span>
+      <label>STD</label>
+    </div>
+    <div class="time">
+      <span id="minutes">00</span>
+      <label>MIN</label>
+    </div>
+    <div class="time">
+      <span id="seconds">00</span>
+      <label>SEK</label>
+    </div>
   </div>
+</div>
 
-  <script>
-    /* ===== Countdown ===== */
-    const targetDate = new Date("2026-07-08T19:30:00");
+<!-- =====================
+     SCRIPT
+===================== -->
+<script>
+/*
+  Zielzeit:
+  08.07.2026 – 19:30 Uhr (lokale Zeit)
+*/
+const targetDate = new Date(
+  2026, // Jahr
+  6,    // Monat (0 = Jan, 6 = Juli)
+  8,    // Tag
+  19,   // Stunde
+  30,   // Minute
+  0     // Sekunde
+);
 
-    function updateCountdown() {
-      const diff = targetDate - new Date();
-      const el = document.getElementById("countdown");
-      if (!el) return;
+function updateCountdown() {
+  const now = new Date();
+  const diff = targetDate.getTime() - now.getTime();
 
-      if (diff <= 0) {
-        el.textContent = "Zeit abgelaufen!";
-        return;
-      }
+  if (diff <= 0) {
+    document.getElementById("countdown").innerHTML =
+      "<strong>Jetzt live!</strong>";
+    return;
+  }
 
-      const s = Math.floor(diff / 1000) % 60;
-      const m = Math.floor(diff / 60000) % 60;
-      const h = Math.floor(diff / 3600000) % 24;
-      const d = Math.floor(diff / 86400000);
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+  const minutes = Math.floor((diff / (1000 * 60)) % 60);
+  const seconds = Math.floor((diff / 1000) % 60);
 
-      el.textContent = `${d} Tage ${h} Stunden ${m} Minuten ${s} Sekunden`;
-    }
+  document.getElementById("days").textContent = days;
+  document.getElementById("hours").textContent = String(hours).padStart(2, "0");
+  document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
+  document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
+}
 
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+updateCountdown();
+setInterval(updateCountdown, 1000);
+</script>
 
-    /* ===== Regen ===== */
-    const canvas = document.getElementById("rain");
-    const ctx = canvas.getContext("2d");
-
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
-
-    window.addEventListener("resize", resizeCanvas);
-    resizeCanvas();
-
-    const wind = -0.55; // leichter Wind nach links
-    const drops = Array.from({ length: 200 }, () => {
-      const vy = 4 + Math.random() * 4;
-      const vx = wind * vy;
-      return {
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx,
-        vy
-      };
-    });
-
-    function drawRain() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = "rgba(255,255,255,0.3)";
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-
-      for (const d of drops) {
-        ctx.moveTo(d.x, d.y);
-        ctx.lineTo(d.x + d.vx * 2, d.y + d.vy * 2);
-
-        d.x += d.vx;
-        d.y += d.vy;
-
-        if (d.y > canvas.height || d.x < -50 || d.x > canvas.width + 50) {
-          if (Math.random() < 0.7) {
-            d.y = -20;
-            d.x = Math.random() * canvas.width;
-          } else {
-            d.x = canvas.width + 20;
-            d.y = Math.random() * canvas.height * 0.5;
-          }
-        }
-      }
-
-      ctx.stroke();
-      requestAnimationFrame(drawRain);
-    }
-
-    drawRain();
-  </script>
 </body>
 </html>
