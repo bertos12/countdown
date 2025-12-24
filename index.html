@@ -39,9 +39,7 @@ body {
   overflow: hidden;
 }
 
-/* =====================
-   MOBILE BACKGROUND
-===================== */
+/* MOBILE BACKGROUND */
 @media (max-width: 768px) {
   body {
     background-image: url("schimmelreiter_mobil.jpg");
@@ -50,17 +48,19 @@ body {
 }
 
 /* =====================
-   COUNTDOWN WRAPPER
+   WRAPPER
 ===================== */
 .countdown-wrapper {
   width: 100%;
   display: flex;
-  justify-content: center;
-  padding-bottom: 5vh; /* Desktop */
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding-bottom: 5vh;
   z-index: 10;
 }
 
-/* 🔧 MOBILE: Countdown höher platzieren */
+/* Mobile: etwas höher */
 @media (max-width: 768px) {
   .countdown-wrapper {
     padding-bottom: 12vh;
@@ -68,9 +68,9 @@ body {
 }
 
 /* =====================
-   GLASS COUNTDOWN BOX
+   GLASS BOX (shared)
 ===================== */
-.countdown-box {
+.glass-box {
   position: relative;
   display: flex;
   gap: 24px;
@@ -88,9 +88,9 @@ body {
 }
 
 /* =====================
-   MIRROR EFFECT (Firefox-safe)
+   MIRROR EFFECT
 ===================== */
-.countdown-box::after {
+.glass-box::after {
   content: "";
   position: absolute;
   left: 0;
@@ -117,7 +117,7 @@ body {
 }
 
 /* =====================
-   TIME BLOCKS
+   COUNTDOWN
 ===================== */
 .time {
   min-width: 70px;
@@ -136,16 +136,28 @@ body {
 }
 
 /* =====================
+   CHRISTMAS BOX
+===================== */
+.christmas-box {
+  font-size: 1.8rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+/* =====================
    MOBILE TUNING
 ===================== */
 @media (max-width: 480px) {
-  .countdown-box {
-    gap: 14px;
+  .glass-box {
     padding: 16px 18px;
   }
 
   .time span {
     font-size: 1.6rem;
+  }
+
+  .christmas-box {
+    font-size: 1.4rem;
   }
 }
 </style>
@@ -154,10 +166,17 @@ body {
 <body>
 
 <!-- =====================
-     COUNTDOWN
+     WRAPPER
 ===================== -->
 <div class="countdown-wrapper">
-  <div class="countdown-box" id="countdown">
+
+  <!-- 🎄 CHRISTMAS BOX (hidden by default) -->
+  <div class="glass-box christmas-box" id="christmasBox" style="display:none;">
+    🎄 Frohe Weihnachten 🎄
+  </div>
+
+  <!-- ⏳ COUNTDOWN -->
+  <div class="glass-box" id="countdown">
     <div class="time">
       <span id="days">0</span>
       <label>TAGE</label>
@@ -175,6 +194,7 @@ body {
       <label>SEK</label>
     </div>
   </div>
+
 </div>
 
 <!-- =====================
@@ -182,42 +202,10 @@ body {
 ===================== -->
 <script>
 /*
-  Zielzeit:
-  08.07.2026 – 19:30 Uhr (lokale Zeit)
+  Countdown-Ziel:
+  08.07.2026 – 19:30 Uhr
 */
-const targetDate = new Date(
-  2026,
-  6,
-  8,
-  19,
-  30,
-  0
-);
+const targetDate = new Date(2026, 6, 8, 19, 30, 0);
 
-function updateCountdown() {
-  const now = new Date();
-  const diff = targetDate.getTime() - now.getTime();
-
-  if (diff <= 0) {
-    document.getElementById("countdown").innerHTML =
-      "<strong>Jetzt live!</strong>";
-    return;
-  }
-
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((diff / (1000 * 60)) % 60);
-  const seconds = Math.floor((diff / 1000) % 60);
-
-  document.getElementById("days").textContent = days;
-  document.getElementById("hours").textContent = String(hours).padStart(2, "0");
-  document.getElementById("minutes").textContent = String(minutes).padStart(2, "0");
-  document.getElementById("seconds").textContent = String(seconds).padStart(2, "0");
-}
-
-updateCountdown();
-setInterval(updateCountdown, 1000);
-</script>
-
-</body>
-</html>
+/*
+  Wei
