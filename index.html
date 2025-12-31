@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Der Schimmelreiter – Countdown</title>
+<title>Der Schimmelreiter – Countdowns</title>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -64,6 +64,14 @@ body {
   box-shadow:0 20px 40px rgba(0,0,0,0.6);
 }
 
+/* TITLES */
+.box-title {
+  font-size:0.9rem;
+  letter-spacing:1px;
+  opacity:0.85;
+  margin-bottom:6px;
+}
+
 /* COUNTDOWN */
 .countdown {
   display:flex;
@@ -87,7 +95,7 @@ body {
   opacity:0.8;
 }
 
-/* SPECIAL DAY BOX */
+/* SPECIAL BOX */
 .special-box {
   font-size:1.4rem;
   font-weight:bold;
@@ -122,24 +130,45 @@ body {
 
 <div class="countdown-wrapper">
 
-  <!-- 🎉 GEBURTSTAGSBOX -->
+  <!-- 🎉 GEBURTSTAG -->
   <div class="glass-box special-box" id="birthdayBox" style="display:none;">
     🎉 Herzlichen Glückwunsch zum Geburtstag 🎉
   </div>
 
-  <!-- ⏳ COUNTDOWN -->
-  <div class="glass-box countdown">
-    <div class="time"><span id="days">0</span><label>TAGE</label></div>
-    <div class="time"><span id="hours">00</span><label>STD</label></div>
-    <div class="time"><span id="minutes">00</span><label>MIN</label></div>
-    <div class="time"><span id="seconds">00</span><label>SEK</label></div>
+  <!-- 🎆 SILVESTER -->
+  <div class="glass-box" id="newYearBox">
+    <div class="box-title">SILVESTER</div>
+
+    <!-- Countdown -->
+    <div class="countdown" id="nyCountdown">
+      <div class="time"><span id="ny_days">0</span><label>TAGE</label></div>
+      <div class="time"><span id="ny_hours">00</span><label>STD</label></div>
+      <div class="time"><span id="ny_minutes">00</span><label>MIN</label></div>
+      <div class="time"><span id="ny_seconds">00</span><label>SEK</label></div>
+    </div>
+
+    <!-- Happy New Year Text -->
+    <div class="special-box" id="nyText" style="display:none;">
+      🎆 Frohes neues Jahr! 🎆
+    </div>
+  </div>
+
+  <!-- ⏳ EVENT -->
+  <div class="glass-box">
+    <div class="box-title">EVENT</div>
+    <div class="countdown">
+      <div class="time"><span id="ev_days">0</span><label>TAGE</label></div>
+      <div class="time"><span id="ev_hours">00</span><label>STD</label></div>
+      <div class="time"><span id="ev_minutes">00</span><label>MIN</label></div>
+      <div class="time"><span id="ev_seconds">00</span><label>SEK</label></div>
+    </div>
   </div>
 
 </div>
 
 <script>
 /* =====================
-   HELPER
+   HELPERS
 ===================== */
 function isMobile() {
   return window.innerWidth <= 768;
@@ -215,17 +244,17 @@ function rain() {
 rain();
 
 /* =====================
-   BIRTHDAY + COUNTDOWN
+   DATES
 ===================== */
-const targetDate = new Date(2026,6,8,19,30,0);
+const eventDate = new Date(2026,6,8,19,30,0);
+const newYearDate = new Date(2025,11,31,23,59,59);
 
+/* =====================
+   BIRTHDAY
+===================== */
 function isBirthdayToday() {
   const n = new Date();
-  return (
-    n.getFullYear() === 2025 &&
-    n.getMonth() === 11 && // Dezember
-    n.getDate() === 25
-  );
+  return n.getFullYear() === 2025 && n.getMonth() === 11 && n.getDate() === 25;
 }
 
 function updateBirthdayBox() {
@@ -239,28 +268,40 @@ function updateBirthdayBox() {
   }
 }
 
-function updateCountdown() {
-  const diff = targetDate - new Date();
+/* =====================
+   COUNTDOWNS
+===================== */
+function updateCountdown(target, prefix) {
+  const diff = target - new Date();
 
-  document.getElementById("days").textContent =
+  document.getElementById(prefix+"_days").textContent =
     Math.max(0, Math.floor(diff / 86400000));
-
-  document.getElementById("hours").textContent =
+  document.getElementById(prefix+"_hours").textContent =
     String(Math.max(0, Math.floor(diff / 3600000) % 24)).padStart(2,"0");
-
-  document.getElementById("minutes").textContent =
+  document.getElementById(prefix+"_minutes").textContent =
     String(Math.max(0, Math.floor(diff / 60000) % 60)).padStart(2,"0");
-
-  document.getElementById("seconds").textContent =
+  document.getElementById(prefix+"_seconds").textContent =
     String(Math.max(0, Math.floor(diff / 1000) % 60)).padStart(2,"0");
+
+  return diff;
 }
 
-updateBirthdayBox();
-updateCountdown();
-setInterval(() => {
+function tick() {
   updateBirthdayBox();
-  updateCountdown();
-}, 1000);
+
+  // Silvester
+  const nyDiff = updateCountdown(newYearDate, "ny");
+  if (nyDiff <= 0) {
+    document.getElementById("nyCountdown").style.display = "none";
+    document.getElementById("nyText").style.display = "block";
+  }
+
+  // Event
+  updateCountdown(eventDate, "ev");
+}
+
+tick();
+setInterval(tick, 1000);
 </script>
 
 </body>
