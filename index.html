@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Der Schimmelreiter – Countdowns</title>
+<title>Der Schimmelreiter – Countdown</title>
 
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -135,24 +135,6 @@ body {
     🎉 Herzlichen Glückwunsch zum Geburtstag 🎉
   </div>
 
-  <!-- 🎆 SILVESTER -->
-  <div class="glass-box" id="newYearBox">
-    <div class="box-title">SILVESTER</div>
-
-    <!-- Countdown -->
-    <div class="countdown" id="nyCountdown">
-      <div class="time"><span id="ny_days">0</span><label>TAGE</label></div>
-      <div class="time"><span id="ny_hours">00</span><label>STD</label></div>
-      <div class="time"><span id="ny_minutes">00</span><label>MIN</label></div>
-      <div class="time"><span id="ny_seconds">00</span><label>SEK</label></div>
-    </div>
-
-    <!-- Happy New Year Text -->
-    <div class="special-box" id="nyText" style="display:none;">
-      🎆 Frohes neues Jahr! 🎆
-    </div>
-  </div>
-
   <!-- ⏳ EVENT -->
   <div class="glass-box">
     <div class="box-title">EVENT</div>
@@ -247,7 +229,6 @@ rain();
    DATES
 ===================== */
 const eventDate = new Date(2026,6,8,19,30,0);
-const newYearDate = new Date(2025,11,31,23,59,59);
 
 /* =====================
    BIRTHDAY
@@ -288,13 +269,6 @@ function updateCountdown(target, prefix) {
 
 function tick() {
   updateBirthdayBox();
-
-  // Silvester
-  const nyDiff = updateCountdown(newYearDate, "ny");
-  if (nyDiff <= 0) {
-    document.getElementById("nyCountdown").style.display = "none";
-    document.getElementById("nyText").style.display = "block";
-  }
 
   // Event
   updateCountdown(eventDate, "ev");
